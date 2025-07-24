@@ -1,2 +1,3 @@
 # studyjava
-UdemyでJavaの勉強をする用
+Javaの勉強をする用
+
