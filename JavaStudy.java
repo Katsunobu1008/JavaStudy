@@ -87,5 +87,18 @@ public class JavaStudy {
         var data2 = new Measurement("佐藤", 60.0, 160.0);
         System.out.println(data1);
         System.out.println(data2);
+
+
+        System.out.println("Start");
+        message("Welcome");
+        System.out.println("End");
+
     }
+    private static void message(String msg1){
+        System.out.println(msg1);
+        System.out.println("レコードについて学習中です。");
+        System.out.println("Javaの世界は奥が深いですね！");
+        System.out.println("これからも頑張って学んでいきましょう！");
+    }
+
 }
