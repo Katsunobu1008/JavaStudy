@@ -47,11 +47,22 @@ public class JavaStudy {
 
         System.out.println(Math.sqrt(pi));
 
-        double value = Math.random();
-        System.out.println("0.0以上1.0未満の乱数: " + value);
+        double value1 = Math.random();
+        System.out.println("0.0以上1.0未満の乱数: " + value1);
 
         double value2 = Math.pow(2.5, 3);
         System.out.println("2.5の3乗は: " + value2);
+
+        double value3 = Math.min(value1,value2);
+        System.out.println("最大値は: " + value3);
+
+        double r = Math.toRadians(30.5);
+        System.out.println("30.5度をラジアンに変換: " + r);
+
+        String name = "山田";
+        int age = 30;
+        double height = 170.5;
+        System.out.printf("名前:%s,年齢:%d,身長:%.2fcm%n", name, age, height);
 
     }
 }
