@@ -145,8 +145,36 @@ public class JavaStudy {
     // System.out.println("最低点: " + minScore);
 
 
+    // // この配列を使ってください
+    // int[] scores = {88, 76, -1, 95, 43, 100, 76};
+    // int total = 0;
+    // int perfectScore = 100;
+    // for(int score : scores){
+    //     if(score >= 0){
+    //         total += score;
+    //     }
+    // }
+    // System.out.println("有効な点数の合計: " + total);
+    // for(int score : scores){
+    //     if(score == 100 ){
+    //         System.out.prrintln("満点がいたぞお");
+    //     }
+    // }
 
+    // この配列を使ってください
+    int[] numbers = {3, 5, 2, 8, 5, 4, 2};
+    int firstDuplicate = -1;
 
+    outerloop;
+    for(int i = 0; i< numbers.length; i++){
+        for(int j = i+1; j < numbers.length; j++){
+
+            if(numbers[i] == numbers{j}){
+                firstDuplicate = numbers[i];
+                break outerloop; // 最初の重複を見つけたらループを抜ける
+            }
+        }
+    }
 
 
     } // mainメソッドの終わり
