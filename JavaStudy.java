@@ -1,110 +1,154 @@
-import java.util.ArrayList;
-import java.util.List;
 
 public class JavaStudy {
     public static void main(String[] args) {
-        // --- 基本的な変数の宣言と表示 ---
-        System.out.println("Welcome to Java Programming!");
 
-        char ch = 'a';
-        System.out.println(ch);
+        // System.out.println("--- 基本的な変数と表示 ---");
+        // System.out.println("Welcome to Java Programming!");
 
-        String str = "こんにちは";
-        System.out.println(str);
+        // char ch = 'a';
+        // System.out.println(ch);
 
-        int number = 20;
-        System.out.println(number);
+        // String str = "こんにちは";
+        // System.out.println(str);
 
-        // --- 簡単な計算 ---
-        int times = 100 + number;
-        System.out.println(times * number);
+        // int number = 20;
+        // System.out.println(number);
 
-        int a = 4;
-        int b = 8;
-        int numberOnePlayer = a * b;
-        System.out.println(numberOnePlayer);
+        // System.out.println("\n--- 簡単な計算 ---");
+        // int times = 100 + number;
+        // System.out.println("120 * 20 = " + (times * number));
 
-        double pi = 3.14;
-        System.out.println(pi * a * a);
+        // int a = 4;
+        // int b = 8;
+        // int numberOnePlayer = a * b;
+        // System.out.println("4 * 8 = " + numberOnePlayer);
 
-        // --- エスケープシーケンス ---
-        System.out.println("こんにちは\nJavaの世界へようこそ！");
+        // double pi = 3.14;
+        // System.out.println("半径4の円の面積(概算): " + (pi * a * a));
 
-        // --- インクリメントとデクリメント ---
-        int n = 10;
-        n++;
-        System.out.println("インクリメント後のn: " + n);
-        n--;
-        System.out.println("デクリメント後のn: " + n);
+        // System.out.println("\n--- エスケープシーケンス ---");
+        // System.out.println("こんにちは\nJavaの世界へようこそ！");
 
-        // --- Mathクラスの利用 ---
-        System.out.println("円周率の平方根: " + Math.sqrt(pi));
+        // System.out.println("\n--- インクリメントとデクリメント ---");
+        // int n = 10;
+        // n++;
+        // System.out.println("インクリメント後のn: " + n);
+        // n--;
+        // System.out.println("デクリメント後のn: " + n);
 
-        double value1 = Math.random();
-        System.out.println("0.0以上1.0未満の乱数: " + value1);
+        // System.out.println("\n--- Mathクラスの利用 ---");
+        // System.out.println("円周率の平方根: " + Math.sqrt(pi));
 
-        double value2 = Math.pow(2.5, 3);
-        System.out.println("2.5の3乗は: " + value2);
+        // double value1 = Math.random();
+        // System.out.println("0.0以上1.0未満の乱数: " + value1);
 
-        // --- 書式文字列 ---
-        String name = "山田";
-        int age = 30;
-        double height = 170.5;
-        System.out.printf("名前:%s, 年齢:%d, 身長:%.2fcm%n", name, age, height);
+        // double value2 = Math.pow(2.5, 3);
+        // System.out.println("2.5の3乗は: " + value2);
 
-        // --- 配列と拡張for文 ---
-        int[] numbers = {1, 2, 3, 4, 5};
-        int total = 0;
-        for (int m : numbers) {
-            total += m; // 配列の各要素mを合計に加える
-            System.out.println("配列の要素: " + m);
-        }
-        System.out.println("合計: " + total);
+        // System.out.println("\n--- 書式文字列 ---");
+        // String name = "山田";
+        // int age = 30;
+        // double height = 170.5;
+        // System.out.printf("名前:%s, 年齢:%d, 身長:%.2fcm%n", name, age, height);
 
-        // --- Listと拡張for文 ---
-        var fruits = List.of("バナナ", "リンゴ", "オレンジ");
-        for (String fruit : fruits) {
-            System.out.println("フルーツ: " + fruit);
-        }
+        // System.out.println("\n--- 配列とfor文 ---");
+        // int[] numbers = {1, 2, 3, 4, 5};
+        // int total = 0;
+        // for (int m : numbers) {
+        //     total += m;
+        // }
+        // System.out.println("配列の合計: " + total);
 
-        List<Integer> numberList = List.of(1, 2, 3, 4, 5);
-        for (int t : numberList) {
-            System.out.println("リストの要素: " + t);
-        }
+        // System.out.println("\n--- Listと拡張for文 ---");
+        // var fruits = List.of("バナナ", "リンゴ", "オレンジ");
+        // for (String fruit : fruits) {
+        //     System.out.println("フルーツ: " + fruit);
+        // }
 
-        // --- ArrayList ---
-        var numbers2 = new ArrayList<Integer>();
-        numbers2.add(10);
-        numbers2.add(20);
-        numbers2.add(30);
-        numbers2.remove(1); // インデックス1の要素(20)を削除
-        for (int n1 : numbers2) {
-            System.out.println("ArrayListの要素: " + n1);
-        }
+        // List<Integer> numberList = List.of(1, 2, 3, 4, 5);
+        // for (int t : numberList) {
+        //     System.out.println("リストの要素: " + t);
+        // }
 
-        // --- レコードの利用 ---
-        var data1 = new Measurement("田中", 70.5, 175.0);
-        var data2 = new Measurement("佐藤", 60.0, 160.0);
-        System.out.println(data1);
-        System.out.println(data2);
+        // System.out.println("\n--- ArrayList ---");
+        // var numbers2 = new ArrayList<Integer>();
+        // numbers2.add(10);
+        // numbers2.add(20);
+        // numbers2.add(30);
+        // numbers2.remove(1); // インデックス1の要素(20)を削除
+        // for (int n1 : numbers2) {
+        //     System.out.println("ArrayListの要素: " + n1);
+        // }
 
+        // System.out.println("\n--- if文 ---");
+        // int score = 85;
+        // System.out.println("現在の点数: " + score);
+        // if (score >= 90) {
+        //     System.out.println("素晴らしい");
+        // } else if (score >= 70) {
+        //     System.out.println("良い");
+        // } else {
+        //     System.out.println("もう少し");
+        // }
 
-        System.out.println("Start");
-        message("Welcome");
-        System.out.println("End");
-
-        for(int i = 0;i <3;i++){
-        System.out.println("こんにちは");
-    }
-
-    }
-    private static void message(String msg1){
-        System.out.println(msg1);
-        System.out.println("レコードについて学習中です。");
-        System.out.println("Javaの世界は奥が深いですね！");
-        System.out.println("これからも頑張って学んでいきましょう！");
-    }
+        // --- レコードの利用（Measurement.javaが同じフォルダにあればコメントを外して使えます） ---
+        // System.out.println("\n--- レコード ---");
+        // var data1 = new Measurement("田中", 70.5, 175.0);
+        // System.out.println(data1);
 
 
+    // int[] numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-}
+    // System.out.println("\n--- 偶数だけを表示する ---");
+    // for(int number : numbers){
+    //     if(number %2 == 0){
+    //         System.out.println("偶数: " + number);
+    //     }
+    // }
+    // System.out.println();
+    // System.out.println("\n ---奇数だけを表示する----");
+    // for(int number : numbers ){
+    //     if(number %2 ==1){
+    //         System.out.println("奇数: " + number);
+    //     }
+    // }
+    // System.out.println();
+    // System.out.println("\n--- 偶数と奇数のカウント ---");
+    // int evenCount = 0;
+    // int oddCount = 0;
+    // for(int number : numbers){
+    //     if(number % 2 == 0){
+    //         evenCount ++;
+    //     }else{
+    //         oddCount ++;
+    //     }
+    // }
+    // System.out.println(evenCount + "個の偶数と" + oddCount + "個の奇数があります。");
+
+    // // この配列を使ってください
+    // int[] scores = {65, 92, 78, 100, 58, 85, 71};
+
+    // int maxScore = scores[0];
+    // int minScore = scores[0];
+
+    // for(int score : scores){
+    //     if(score > maxScore){
+    //         maxScore = score;
+    //     }
+    // }
+    // System.out.println("最高点: " + maxScore);
+    // for(int score : scores){
+    //     if(score < minScore){
+    //         minScore = score;
+    //     }
+    // }
+    // System.out.println("最低点: " + minScore);
+
+
+
+
+
+
+    } // mainメソッドの終わり
+
+} // JavaStudyクラスの終わり
