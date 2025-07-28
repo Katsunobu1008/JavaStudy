@@ -162,21 +162,39 @@ public class JavaStudy {
     // }
 
     // この配列を使ってください
-    int[] numbers = {3, 5, 2, 8, 5, 4, 2};
-    int firstDuplicate = -1;
 
-    outerloop;
-    for(int i = 0; i< numbers.length; i++){
-        for(int j = i+1; j < numbers.length; j++){
 
-            if(numbers[i] == numbers{j}){
-                firstDuplicate = numbers[i];
-                break outerloop; // 最初の重複を見つけたらループを抜ける
-            }
-        }
+    //   int[] numbers = {3, 5, 2, 8, 5, 4, 2};
+    //     int firstDuplicate = -1; // 重複が見つからなかった場合の初期値
+
+    //     // 外側のループ (基準となる数値を選ぶ)
+    //     outerLoop: // 外側のループに名前を付ける
+    //     for (int i = 0; i < numbers.length; i++) {
+
+    //         // 内側のループ (比較対象の数値を選ぶ)
+    //         for (int j = i + 1; j < numbers.length; j++) {
+
+    //             // 基準の数値と比較対象の数値が同じかチェック
+    //             if (numbers[i] == numbers[j]) {
+    //                 firstDuplicate = numbers[i]; // 重複した数値を記録
+    //                 break outerLoop; // 名前を付けた外側のループを抜ける
+    //             }
+    //         }
+    //     }
+
+    //     // 最終的な結果を表示
+    //     if (firstDuplicate != -1) {
+    //         System.out.println("最初の重複する数値は " + firstDuplicate + " です。");
+    //     } else {
+    //         System.out.println("重複する数値はありません。");
+    //     }
+    // }
+    Dog pochi = new Dog("ポチ",3);
+
+    pochi.bark();
+
+
     }
+} // mainメソッドの終わり
 
-
-    } // mainメソッドの終わり
-
-} // JavaStudyクラスの終わり
+ // JavaStudyクラスの終わり
