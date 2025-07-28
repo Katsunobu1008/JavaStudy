@@ -192,6 +192,19 @@ public class JavaStudy {
     Dog pochi = new Dog("ポチ",3);
 
     pochi.bark();
+      // 1. 鈴木さんの口座インスタンスを作成
+        BankAccount suzukiAccount = new BankAccount("鈴木", 10000);
+
+        System.out.println("--- 取引開始 ---");
+        // 2. 3000円を預入
+        suzukiAccount.deposit(3000);
+
+        // 3. 1500円を引き出し
+        suzukiAccount.withdraw(1500);
+        System.out.println("--- 取引終了 ---");
+
+        // 4. 最終残高を表示
+        suzukiAccount.showBalance()
 
 
     }
