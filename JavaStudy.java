@@ -93,6 +93,10 @@ public class JavaStudy {
         message("Welcome");
         System.out.println("End");
 
+        for(int i = 0;i <3;i++){
+        System.out.println("こんにちは");
+    }
+
     }
     private static void message(String msg1){
         System.out.println(msg1);
@@ -100,5 +104,7 @@ public class JavaStudy {
         System.out.println("Javaの世界は奥が深いですね！");
         System.out.println("これからも頑張って学んでいきましょう！");
     }
+
+
 
 }
