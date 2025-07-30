@@ -28,8 +28,6 @@ public class Book{
   public void readPage(){
     if(currentPage < pageCount){
       currentPage++;
-    } else {
-      System.out.println("これ以上読むことはできません。");
     }
   }
 

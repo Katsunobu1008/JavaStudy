@@ -207,7 +207,7 @@ public class JavaStudy {
     //     suzukiAccount.showBalance()；
 
     // 1. 2冊の本のインスタンスを作成
-        Book book1 = new Book("Java入門", "山田太郎", 300);
+        Book book1 = new Book("Java入門", "山田太郎", 100);
         Book book2 = new Book("Python入門", "佐藤花子");
 
         System.out.println("--- 本の情報 ---");
