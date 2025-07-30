@@ -189,22 +189,39 @@ public class JavaStudy {
     //         System.out.println("重複する数値はありません。");
     //     }
     // }
-    Dog pochi = new Dog("ポチ",3);
+    // Dog pochi = new Dog("ポチ",3);
 
-    pochi.bark();
-      // 1. 鈴木さんの口座インスタンスを作成
-        BankAccount suzukiAccount = new BankAccount("鈴木", 10000);
+    // pochi.bark();
+    //   // 1. 鈴木さんの口座インスタンスを作成
+    //     BankAccount suzukiAccount = new BankAccount("鈴木", 10000);
 
-        System.out.println("--- 取引開始 ---");
-        // 2. 3000円を預入
-        suzukiAccount.deposit(3000);
+    //     System.out.println("--- 取引開始 ---");
+    //     // 2. 3000円を預入
+    //     suzukiAccount.deposit(3000);
 
-        // 3. 1500円を引き出し
-        suzukiAccount.withdraw(1500);
-        System.out.println("--- 取引終了 ---");
+    //     // 3. 1500円を引き出し
+    //     suzukiAccount.withdraw(1500);
+    //     System.out.println("--- 取引終了 ---");
 
-        // 4. 最終残高を表示
-        suzukiAccount.showBalance()
+    //     // 4. 最終残高を表示
+    //     suzukiAccount.showBalance()；
+
+    // 1. 2冊の本のインスタンスを作成
+        Book book1 = new Book("Java入門", "山田太郎", 300);
+        Book book2 = new Book("Python入門", "佐藤花子");
+
+        System.out.println("--- 本の情報 ---");
+        // 2. 本の情報を表示
+        System.out.println("作成された本の総数"+ Book.getBookCount() + "冊");
+        System.out.println("---");
+
+        // 3. 読書状況を表示
+        book1.readPage();
+        book1.readPage();
+
+        book1.showStatus();
+        book2.showStatus();
+
 
 
     }
