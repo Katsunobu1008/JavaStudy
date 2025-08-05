@@ -206,22 +206,24 @@ public class JavaStudy {
     //     // 4. 最終残高を表示
     //     suzukiAccount.showBalance()；
 
-    // 1. 2冊の本のインスタンスを作成
-        Book book1 = new Book("Java入門", "山田太郎", 100);
-        Book book2 = new Book("Python入門", "佐藤花子");
+    // // 1. 2冊の本のインスタンスを作成
+    //     Book book1 = new Book("Java入門", "山田太郎", 100);
+    //     Book book2 = new Book("Python入門", "佐藤花子");
 
-        System.out.println("--- 本の情報 ---");
-        // 2. 本の情報を表示
-        System.out.println("作成された本の総数"+ Book.getBookCount() + "冊");
-        System.out.println("---");
+    //     System.out.println("--- 本の情報 ---");
+    //     // 2. 本の情報を表示
+    //     System.out.println("作成された本の総数"+ Book.getBookCount() + "冊");
+    //     System.out.println("---");
 
-        // 3. 読書状況を表示
-        book1.readPage();
-        book1.readPage();
+    //     // 3. 読書状況を表示
+    //     book1.readPage();
+    //     book1.readPage();
 
-        book1.showStatus();
-        book2.showStatus();
+    //     book1.showStatus();
+    //     book2.showStatus();
 
+
+    System.out.println("aaaa");
 
 
     }
