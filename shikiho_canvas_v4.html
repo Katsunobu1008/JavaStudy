@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>四季報写経ダッシュボード（Canvas版 v3）</title>
+    <!--
+要求の明確化（本版で実装）
+1) ヘッダー（2行）
+   行1: 「会社名｜証券コード｜業界（幅広）」
+   行2: 「上場年｜創業年｜時価総額(億円)」。業界の直下に業界ベンチ(営業利益率/純利益率/PER)を"日本語表記"で自動表示。
+   * ベンチは業界セレクトに連動。
+2) KPIカード: ROE/ROA/PER/PBR/EPS。各カードホバーで式と意味を表示。
+3) PL: 主要5項目のみ（売上/営利/経常/税前/純利）。ラベルは枠内クランプで重なり/はみ出しを抑制。
+4) BS: 入力はすべて左カラムに集約し、左サブ列=資産、右サブ列=負債・純資産で“視覚的に”右側のグラフ（左=資産 / 右=負債+純資産）に対応。
+   * 流動・固定の内訳も入力可。右側のグラフに比率反映。
+   * 自己資本比率・整合チェック表示。
+5) CF: 入力は縦1列（営業→投資→財務→合計→パターン）。8類型の自動判定/反映。マイナスバー確実表示。
+6) メモ: Markdown対応。入力/プレビューを拡大（高さ拡張、レスポンシブ）。
+7) 全体: レスポンシブ、フォーム/カードの視認性向上（控えめグラデ/影）。
+-->
+    <style>
+      :root {
+        --bg: #f6f7fb;
+        --card: #ffffff;
+        --line: #e5e7eb;
+        --text: #111827;
+        --blue: #4f8dfb;
+        --blue2: #a9c7ff;
+        --orange: #ffb38a;
+        --orange2: #ffd9c6;
+        --green: #41b68f;
+        --green2: #b8ecd9;
+        --green3: #6dd3a9;
+        --red: #f87171;
+        --gray: #94a3b8;
+        --muted: #64748b;
+        --canvas-h: clamp(260px, 42vh, 380px);
+      }
+      html,
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+          Arial, 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 6px 0 0;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 16px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 6px 18px rgba(17, 24, 39, 0.04);
+      }
+      .section-title {
+        margin: 0 0 8px;
+        font-weight: 700;
+      }
+      .subtle {
+        font-size: 12px;
+        color: #6b7280;
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 160px;
+      }
+      .field label {
+        font-size: 12px;
+        color: #374151;
+      }
+      .field input,
+      .field select,
+      textarea {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 10px;
+        background: #fff;
+      }
+      .field input[type='number'] {
+        text-align: right;
+      }
+      .meta-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 2fr;
+        grid-auto-rows: auto;
+        gap: 12px;
+        align-items: end;
+      }
+      @media (max-width: 960px) {
+        .meta-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .bench-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+      }
+      .bench-chip {
+        background: #f9fafb;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+      .kpis {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        margin-top: 10px;
+      }
+      @media (max-width: 960px) {
+        .kpis {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      .kpi {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 8px 10px;
+        background: linear-gradient(180deg, #fff, #fbfdff);
+      }
+      .kpi .name {
+        font-size: 12px;
+        color: #374151;
+      }
+      .kpi .val {
+        font-weight: 600;
+        text-align: right;
+        font-feature-settings: 'tnum';
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      @media (max-width: 960px) {
+        .grid2 {
+          grid-template-columns: 1fr;
+        }
+      }
+      .inputs-grid {
+        display: grid;
+        gap: 10px;
+      }
+      .inputs-2col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 12px;
+      }
+      .inputs-2col > .group-title {
+        grid-column: span 1;
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 600;
+        margin-top: -4px;
+      }
+      canvas {
+        width: 100%;
+        height: var(--canvas-h);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+      }
+      .tooltip {
+        position: fixed;
+        pointer-events: none;
+        background: #111827;
+        color: #fff;
+        padding: 6px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        opacity: 0;
+        transition: opacity 0.08s;
+        z-index: 1000;
+        max-width: 320px;
+        line-height: 1.35;
+      }
+      .md-preview {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
+        margin-top: 8px;
+      }
+      .md-preview h3 {
+        margin: 0.6em 0 0.3em;
+        font-size: 1.05rem;
+      }
+      .md-preview ul {
+        margin: 0.4em 0 0.6em 1em;
+      }
+      .md-preview li {
+        margin: 0.2em 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- ===== ヘッダー：2行構成 ===== -->
+      <header class="card">
+        <h1>四季報写経ダッシュボード（Canvas版 v3）</h1>
+        <div class="meta-grid" style="margin-top: 8px">
+          <div class="field">
+            <label>会社名</label
+            ><input data-bind="meta.name" placeholder="会社名" />
+          </div>
+          <div class="field">
+            <label>証券コード</label
+            ><input data-bind="meta.code" placeholder="例: 0000" />
+          </div>
+          <div class="field" style="min-width: 240px">
+            <label>業界</label>
+            <select data-bind="meta.industry" id="industrySel"></select>
+            <div class="bench-row">
+              <div class="bench-chip">
+                業界 営業利益率（今期予想）: <b id="bench-opm">—</b>
+              </div>
+              <div class="bench-chip">
+                業界 純利益率（今期予想）: <b id="bench-npm">—</b>
+              </div>
+              <div class="bench-chip">
+                業界 PER（今期予想）: <b id="bench-per">—</b>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>上場年</label
+            ><input type="number" data-bind="meta.listingYear" />
+          </div>
+          <div class="field">
+            <label>創業年</label
+            ><input type="number" data-bind="meta.foundingYear" />
+          </div>
+          <div class="field">
+            <label>時価総額(億円)</label
+            ><input type="number" step="any" data-bind="meta.marketCapOku" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top: 8px">
+          <div class="field" style="min-width: 180px">
+            <label>いつの四季報</label>
+            <select data-bind="meta.issue">
+              <option>2023新春</option>
+              <option>2023春</option>
+              <option>2023夏</option>
+              <option>2023秋</option>
+              <option>2024新春</option>
+              <option selected>2024春</option>
+              <option>2024夏</option>
+              <option>2024秋</option>
+              <option>2025新春</option>
+              <option>2025春</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>記述日</label
+            ><input type="date" data-bind="meta.entryDate" />
+          </div>
+          <div class="field">
+            <label>海外比率(%)</label
+            ><input type="number" step="any" data-bind="meta.overseasRatio" />
+          </div>
+          <div class="field">
+            <label>発行株式数(百万株)</label
+            ><input type="number" step="any" data-bind="meta.sharesMillion" />
+          </div>
+        </div>
+
+        <!-- KPI -->
+        <div class="kpis">
+          <div
+            class="kpi"
+            data-tip="ROE：株主資本に対する収益性。計算式：純利益 / 自己資本"
+          >
+            <div class="name">ROE</div>
+            <div id="kpi-roe" class="val">—</div>
+          </div>
+          <div
+            class="kpi"
+            data-tip="ROA：総資産に対する収益性。計算式：純利益 / 総資産"
+          >
+            <div class="name">ROA</div>
+            <div id="kpi-roa" class="val">—</div>
+          </div>
+          <div
+            class="kpi"
+            data-tip="PER：株価収益率。計算式：時価総額 / 純利益（単位差は自動調整）"
+          >
+            <div class="name">PER</div>
+            <div id="kpi-per" class="val">—</div>
+          </div>
+          <div
+            class="kpi"
+            data-tip="PBR：株価純資産倍率。計算式：時価総額 / 自己資本（単位差は自動調整）"
+          >
+            <div class="name">PBR</div>
+            <div id="kpi-pbr" class="val">—</div>
+          </div>
+          <div
+            class="kpi"
+            data-tip="EPS：1株あたり利益。計算式：純利益 / 発行株式数（百万円 ÷ 百万株 = 円）"
+          >
+            <div class="name">EPS(円)</div>
+            <div id="kpi-eps" class="val">—</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ===== PL ===== -->
+      <section class="card" style="margin-top: 12px">
+        <h2 class="section-title">PL（損益計算書 / 単位: 百万円）</h2>
+        <div class="grid2">
+          <div class="inputs-grid">
+            <div class="field">
+              <label>売上高</label
+              ><input type="number" step="any" data-bind="pl.revenueMm" /><span
+                class="subtle"
+                >百万円</span
+              >
+            </div>
+            <div class="field">
+              <label>営業利益</label
+              ><input type="number" step="any" data-bind="pl.opMm" /><span
+                class="subtle"
+                >百万円</span
+              >
+            </div>
+            <div class="field">
+              <label>経常利益</label
+              ><input type="number" step="any" data-bind="pl.ordMm" /><span
+                class="subtle"
+                >百万円</span
+              >
+            </div>
+            <div class="field">
+              <label>税前利益</label
+              ><input type="number" step="any" data-bind="pl.pretaxMm" /><span
+                class="subtle"
+                >百万円</span
+              >
+            </div>
+            <div class="field">
+              <label>純利益</label
+              ><input type="number" step="any" data-bind="pl.netMm" /><span
+                class="subtle"
+                >百万円</span
+              >
+            </div>
+          </div>
+          <div><canvas id="plCanvas"></canvas></div>
+        </div>
+      </section>
+
+      <!-- ===== BS（入力は左。左サブ列=資産｜右サブ列=負債・純資産） ===== -->
+      <section class="card" style="margin-top: 12px">
+        <h2 class="section-title">BS（貸借対照表 / 単位: 百万円）</h2>
+        <div class="grid2">
+          <div>
+            <div class="inputs-2col">
+              <div class="group-title">資産（左）</div>
+              <div class="group-title">負債・純資産（右）</div>
+
+              <div class="field">
+                <label>総資産</label
+                ><input type="number" step="any" data-bind="bs.totalAssetsMm" />
+              </div>
+              <div class="field">
+                <label>総負債</label
+                ><input type="number" step="any" data-bind="bs.totalLiabMm" />
+              </div>
+
+              <div class="field">
+                <label>流動資産</label
+                ><input
+                  type="number"
+                  step="any"
+                  data-bind="bs.currentAssetsMm"
+                />
+              </div>
+              <div class="field">
+                <label>流動負債</label
+                ><input
+                  type="number"
+                  step="any"
+                  data-bind="bs.currentLiabilitiesMm"
+                />
+              </div>
+
+              <div class="field">
+                <label>固定資産</label
+                ><input
+                  type="number"
+                  step="any"
+                  data-bind="bs.nonCurrentAssetsMm"
+                />
+              </div>
+              <div class="field">
+                <label>固定負債</label
+                ><input
+                  type="number"
+                  step="any"
+                  data-bind="bs.nonCurrentLiabilitiesMm"
+                />
+              </div>
+
+              <div class="field">
+                <label>—</label>
+                <div class="subtle">&nbsp;</div>
+              </div>
+              <div class="field">
+                <label>自己資本</label
+                ><input type="number" step="any" data-bind="bs.equityMm" />
+              </div>
+
+              <div class="field">
+                <label>—</label>
+                <div class="subtle">&nbsp;</div>
+              </div>
+              <div class="field">
+                <label>資本金</label
+                ><input
+                  type="number"
+                  step="any"
+                  data-bind="bs.capitalStockMm"
+                />
+              </div>
+
+              <div class="field">
+                <label>—</label>
+                <div class="subtle">&nbsp;</div>
+              </div>
+              <div class="field">
+                <label>利益剰余金</label
+                ><input
+                  type="number"
+                  step="any"
+                  data-bind="bs.retainedEarningsMm"
+                />
+              </div>
+
+              <div class="field">
+                <label>—</label>
+                <div class="subtle">&nbsp;</div>
+              </div>
+              <div class="field">
+                <label>有利子負債</label
+                ><input
+                  type="number"
+                  step="any"
+                  data-bind="bs.interestBearingDebtMm"
+                />
+              </div>
+            </div>
+            <div class="subtle" id="bsCheck" style="margin-top: 8px">
+              検証: 資産−(負債+純資産)=— / 自己資本比率=—
+            </div>
+          </div>
+          <div><canvas id="bsCanvas"></canvas></div>
+        </div>
+      </section>
+
+      <!-- ===== CF（入力は縦1列） ===== -->
+      <section class="card" style="margin-top: 12px">
+        <h2 class="section-title">CF（キャッシュフロー / 単位: 億円）</h2>
+        <div class="grid2">
+          <div class="inputs-grid" style="max-width: 420px">
+            <div class="field">
+              <label>営業CF</label
+              ><input type="number" step="any" data-bind="cf.cfoOku" /><span
+                class="subtle"
+                >億円</span
+              >
+            </div>
+            <div class="field">
+              <label>投資CF</label
+              ><input type="number" step="any" data-bind="cf.cfiOku" /><span
+                class="subtle"
+                >億円</span
+              >
+            </div>
+            <div class="field">
+              <label>財務CF</label
+              ><input type="number" step="any" data-bind="cf.cffOku" /><span
+                class="subtle"
+                >億円</span
+              >
+            </div>
+            <div class="field">
+              <label>合計変動</label
+              ><input
+                type="number"
+                step="any"
+                data-bind="cf.totalOku"
+                disabled
+              /><span class="subtle">億円</span>
+            </div>
+            <div class="field">
+              <label>パターン</label><input data-bind="cf.pattern" disabled />
+            </div>
+          </div>
+          <div><canvas id="cfCanvas"></canvas></div>
+        </div>
+
+        <div style="margin-top: 10px">
+          <label class="section-title">メモ（Markdown可）</label>
+          <textarea
+            id="memo"
+            rows="22"
+            style="width: 100%; resize: vertical; min-height: 320px"
+            data-bind="cf.memo"
+          ></textarea>
+          <div id="memoPreview" class="md-preview"></div>
+        </div>
+      </section>
+    </div>
+
+    <div id="tooltip" class="tooltip"></div>
+
+    <script>
+      /* ===== 業界ベンチ（四季報 24年春号） ===== */
+      const INDUSTRY_BENCH = {
+        食料品: { opm: 7.91399964, npm: 5.67048405, per: 44.2 },
+        繊維製品: { opm: 4.042879531, npm: 2.88753293, per: 33.1 },
+        'パルプ・紙': { opm: 3.777233908, npm: 2.6425234, per: 23.5 },
+        化学: { opm: 7.487554104, npm: 7.72710935, per: 23.5 },
+        医薬品: { opm: 13.12834698, npm: 9.79465028, per: 21.1 },
+        石油石炭製品: { opm: 3.253709695, npm: 1.98251211, per: 27.5 },
+        ゴム製品: { opm: 10.74917758, npm: 7.34405065, per: 12.2 },
+        'ガラス・土石製品': { opm: 7.988443567, npm: 5.74849303, per: 39.3 },
+        鉄鋼: { opm: 7.154871391, npm: 5.15713372, per: 19.2 },
+        非鉄金属: { opm: 3.919826899, npm: 2.58436776, per: 43.4 },
+        金属製品: { opm: 4.837675262, npm: 3.47096289, per: 16.6 },
+        機械: { opm: 9.309616408, npm: 6.25513256, per: 19.6 },
+        電気機器: { opm: 8.398563839, npm: 6.31013584, per: 24.4 },
+        輸送用機械: { opm: 7.896348716, npm: 6.42584533, per: 13.2 },
+        精密機械: { opm: 11.42371629, npm: 11.4990765, per: 26 },
+        その他機械: { opm: 10.03373692, npm: 8.68854143, per: 21.5 },
+        製造業: { opm: 7.822017061, npm: 5.8859702, per: 23.9 },
+        水産農林業: { opm: 3.528015389, npm: 3.03687636, per: 22.2 },
+        鉱業: { opm: 14.44655651, npm: 11.4490423, per: 10.2 },
+        建設業: { opm: 5.448629585, npm: 3.94487224, per: 18.4 },
+        電気ガス業: { opm: 7.418211998, npm: 5.65950673, per: 9.9 },
+        陸運業: { opm: 9.526993517, npm: 6.3064579, per: 17.1 },
+        海運業: { opm: 7.510761193, npm: 10.7391192, per: 30.7 },
+        空運業: { opm: 8.60206778, npm: 5.92113702, per: 10.3 },
+        '倉庫・運輸関連業': { opm: 6.772719434, npm: 5.62165891, per: 11.7 },
+        情報通信業: { opm: 12.80963901, npm: 8.04500077, per: 49 },
+        卸売業: { opm: 3.966592254, npm: 4.15278395, per: 15.4 },
+        小売業: { opm: 4.955014455, npm: 2.85193646, per: 35.4 },
+        不動産業: { opm: 12.04456369, npm: 7.81679874, per: 17.3 },
+        サービス業: { opm: 5.660451744, npm: 4.72272206, per: 35.7 },
+        非製造業: { opm: 6.604800634, npm: 4.98601857, per: 31.8 },
+        金融を除く全産業: { opm: 7.255189273, npm: 5.46688482, per: 28.7 },
+        銀行業: { opm: 12.2631622, npm: 12.2631622, per: 28.7 },
+        証券業: { opm: 15.35764617, npm: 11.5732307, per: 18.9 },
+        保険業: { opm: 5.25007111, npm: 5.25007111, per: 19.6 },
+        その他金融業: { opm: 11.24031008, npm: 8.99658757, per: 13.3 },
+        金融: { opm: 8.96011211, npm: 8.96011211, per: 13.9 },
+        全産業: { opm: 6.830069793, npm: 5.75267581, per: 28 },
+      };
+
+      /* ===== 初期状態（デモ数値入り） ===== */
+      const DEFAULT_STATE = {
+        meta: {
+          name: 'デモ株式会社',
+          code: '0000',
+          industry: '情報通信業',
+          listingYear: 2018,
+          foundingYear: 2010,
+          marketCapOku: 10000,
+          sharesMillion: 1000,
+          overseasRatio: 35,
+          issue: '2024春',
+          entryDate: new Date().toISOString().slice(0, 10),
+        },
+        pl: {
+          revenueMm: 1200000,
+          opMm: 150000,
+          ordMm: 155000,
+          pretaxMm: 150000,
+          netMm: 50000,
+        },
+        bs: {
+          totalAssetsMm: 2000000,
+          totalLiabMm: 1400000,
+          equityMm: 600000,
+          currentAssetsMm: 900000,
+          nonCurrentAssetsMm: 1100000,
+          currentLiabilitiesMm: 800000,
+          nonCurrentLiabilitiesMm: 600000,
+          capitalStockMm: 100000,
+          retainedEarningsMm: 450000,
+          interestBearingDebtMm: 700000,
+        },
+        cf: {
+          cfoOku: 1500,
+          cfiOku: -800,
+          cffOku: -400,
+          totalOku: 300,
+          pattern: '健全型',
+          memo: `### □ビジネスモデル
+
+- サブスク + 広告
+
+### □特色
+
+- 国内シェア上位
+
+### □連結事業
+
+- メディア 60% / クラウド 40%
+
+### □業績記事
+
+- 新規SaaSが寄与し増収増益
+
+### □材料記事
+
+- 自社株買いを発表
+
+### □コメントと考察
+
+- 粗利率向上の余地あり
+
+### □学び
+
+- 解像度はCFから作る
+
+### □疑問
+
+- 海外売上の拡大余地？`,
+        },
+      };
+      const STORAGE_KEY = 'shikiho_canvas_v3';
+      const state =
+        JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') ||
+        structuredClone(DEFAULT_STATE);
+      const save = () =>
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+      /* ===== 小ユーティリティ ===== */
+      const n = (v) => (isFinite(+v) ? +v : 0);
+      const fmt = (v) => (isFinite(v) ? v.toLocaleString('ja-JP') : '—');
+      const clampY = (y, min, max) => Math.min(max, Math.max(min, y));
+
+      /* ===== 入力セレクト：業界 ===== */
+      const sel = document.getElementById('industrySel');
+      sel.innerHTML = Object.keys(INDUSTRY_BENCH)
+        .map((k) => `<option>${k}</option>`)
+        .join('');
+      sel.value = state.meta.industry || '情報通信業';
+
+      /* ===== データバインド ===== */
+      document.querySelectorAll('[data-bind]').forEach((el) => {
+        const path = el.getAttribute('data-bind');
+        const v = path
+          .split('.')
+          .reduce((o, k) => (o ? o[k] : undefined), state);
+        if (v != null) el.value = v;
+        el.addEventListener('input', () => {
+          const keys = path.split('.');
+          let o = state;
+          for (let i = 0; i < keys.length - 1; i++) {
+            if (!(keys[i] in o)) o[keys[i]] = {};
+            o = o[keys[i]];
+          }
+          const val =
+            el.type === 'number'
+              ? el.value === ''
+                ? null
+                : Number(el.value)
+              : el.value;
+          o[keys.at(-1)] = val;
+          calcDerived();
+          renderAll();
+          save();
+        });
+      });
+
+      /* ===== KPI ===== */
+      const perFrom = (mktCapOku, netMm) =>
+        mktCapOku && netMm ? (mktCapOku / netMm) * 100 : NaN;
+      const pbrFrom = (mktCapOku, eqMm) =>
+        mktCapOku && eqMm ? (mktCapOku / eqMm) * 100 : NaN;
+      const epsFrom = (netMm, sharesMil) =>
+        netMm && sharesMil ? netMm / sharesMil : NaN;
+      function renderKPIs() {
+        const net = n(state.pl.netMm),
+          eq = n(state.bs.equityMm),
+          assets = n(state.bs.totalAssetsMm);
+        const mkt = n(state.meta.marketCapOku),
+          sh = n(state.meta.sharesMillion);
+        document.getElementById('kpi-roe').textContent = eq
+          ? ((net / eq) * 100).toFixed(1) + '%'
+          : '—';
+        document.getElementById('kpi-roa').textContent = assets
+          ? ((net / assets) * 100).toFixed(1) + '%'
+          : '—';
+        const per = perFrom(mkt, net);
+        document.getElementById('kpi-per').textContent = isFinite(per)
+          ? per.toFixed(1)
+          : '—';
+        const pbr = pbrFrom(mkt, eq);
+        document.getElementById('kpi-pbr').textContent = isFinite(pbr)
+          ? pbr.toFixed(2)
+          : '—';
+        const eps = epsFrom(net, sh);
+        document.getElementById('kpi-eps').textContent = isFinite(eps)
+          ? Math.round(eps).toLocaleString('ja-JP')
+          : '—';
+      }
+
+      /* ===== 業界ベンチ表示 ===== */
+      function renderBench() {
+        const ind = sel.value;
+        const b = INDUSTRY_BENCH[ind];
+        document.getElementById('bench-opm').textContent = b
+          ? b.opm.toFixed(1) + '%'
+          : '—';
+        document.getElementById('bench-npm').textContent = b
+          ? b.npm.toFixed(1) + '%'
+          : '—';
+        document.getElementById('bench-per').textContent = b
+          ? b.per.toString() + '倍'
+          : '—';
+      }
+      sel.addEventListener('change', () => {
+        state.meta.industry = sel.value;
+        renderBench();
+        save();
+      });
+
+      /* ===== ツールチップ ===== */
+      const tip = document.getElementById('tooltip');
+      const showTip = (html, x, y) => {
+        tip.innerHTML = html;
+        tip.style.left = x + 12 + 'px';
+        tip.style.top = y + 12 + 'px';
+        tip.style.opacity = '1';
+      };
+      const hideTip = () => {
+        tip.style.opacity = '0';
+      };
+
+      /* KPIカードのホバー */
+      document.querySelectorAll('.kpi').forEach((el) => {
+        const t = el.getAttribute('data-tip') || '';
+        el.addEventListener('mouseenter', (e) =>
+          showTip(t, e.clientX, e.clientY)
+        );
+        el.addEventListener('mousemove', (e) =>
+          showTip(t, e.clientX, e.clientY)
+        );
+        el.addEventListener('mouseleave', hideTip);
+      });
+
+      /* ===== Canvas helpers ===== */
+      function setupCanvas(canvas, cssWidth, cssHeight) {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.floor(cssWidth * dpr);
+        canvas.height = Math.floor(cssHeight * dpr);
+        canvas.style.width = cssWidth + 'px';
+        canvas.style.height = cssHeight + 'px';
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return ctx;
+      }
+      const clear = (ctx, w, h) => ctx.clearRect(0, 0, w, h);
+      function rrect(ctx, x, y, w, h, r) {
+        if (ctx.roundRect) {
+          ctx.beginPath();
+          ctx.roundRect(x, y, w, h, r);
+          return;
+        }
+        r = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      }
+
+      /* ===== PL ===== */
+      function drawPL() {
+        const c = document.getElementById('plCanvas');
+        const rect = c.getBoundingClientRect();
+        const ctx = setupCanvas(c, rect.width, rect.height);
+        const W = rect.width,
+          H = rect.height;
+        clear(ctx, W, H);
+        const data = [
+          { name: '売上高', v: n(state.pl.revenueMm) },
+          { name: '営業利益', v: n(state.pl.opMm) },
+          { name: '経常利益', v: n(state.pl.ordMm) },
+          { name: '税前利益', v: n(state.pl.pretaxMm) },
+          { name: '純利益', v: n(state.pl.netMm) },
+        ];
+        const rev = data[0].v || 0;
+        const margins = [
+          null,
+          rev ? data[1].v / rev : null,
+          rev ? data[2].v / rev : null,
+          rev ? data[3].v / rev : null,
+          rev ? data[4].v / rev : null,
+        ];
+        const maxAbs = Math.max(1, ...data.map((d) => Math.abs(d.v)));
+        const M = { l: 50, r: 20, t: 26, b: 46 };
+        const zeroY = H - M.b - ((0 + maxAbs) / (maxAbs * 2)) * (H - M.t - M.b);
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath();
+        ctx.moveTo(M.l, zeroY);
+        ctx.lineTo(W - M.r, zeroY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        const barW = Math.min(90, ((W - M.l - M.r) / data.length) * 0.6);
+        const gap = (W - M.l - M.r) / data.length;
+        const shapes = [];
+        data.forEach((d, i) => {
+          const x = M.l + i * gap + (gap - barW) / 2;
+          const h = (Math.abs(d.v) / (maxAbs * 2)) * (H - M.t - M.b) * 2;
+          const y = d.v >= 0 ? zeroY - h : zeroY;
+          const color = i === 0 ? '#3b82f6' : d.v >= 0 ? '#60a5fa' : '#f87171';
+          ctx.fillStyle = color;
+          rrect(ctx, x, y, barW, h, 6);
+          ctx.fill();
+          if (h > 20) {
+            ctx.fillStyle = '#111827';
+            ctx.font = '12px system-ui';
+            ctx.textAlign = 'center';
+            const ty = clampY(d.v >= 0 ? y - 6 : y + h + 14, 12, H - 18);
+            ctx.fillText(fmt(d.v), x + barW / 2, ty);
+          }
+          ctx.fillStyle = '#374151';
+          ctx.font = '12px system-ui';
+          ctx.textAlign = 'center';
+          ctx.fillText(d.name, x + barW / 2, H - 18);
+          shapes.push({
+            x,
+            y,
+            w: barW,
+            h,
+            tip: `<b>${d.name}</b><br>${fmt(d.v)} 百万円${
+              margins[i] != null
+                ? '<br>売上比 ' + (margins[i] * 100).toFixed(1) + '%'
+                : ''
+            }`,
+          });
+        });
+        c.onmousemove = (ev) => {
+          const { x, y } = ev;
+          const ox = ev.offsetX,
+            oy = ev.offsetY;
+          const hit = shapes.find(
+            (s) => ox >= s.x && ox <= s.x + s.w && oy >= s.y && oy <= s.y + s.h
+          );
+          if (hit) showTip(hit.tip, x, y);
+          else hideTip();
+        };
+        c.onmouseleave = hideTip;
+      }
+
+      /* ===== BS（比率反映／入力位置対応） ===== */
+      function drawBS() {
+        const c = document.getElementById('bsCanvas');
+        const rect = c.getBoundingClientRect();
+        const ctx = setupCanvas(c, rect.width, rect.height);
+        const W = rect.width,
+          H = rect.height;
+        clear(ctx, W, H);
+        let A = n(state.bs.totalAssetsMm),
+          L = n(state.bs.totalLiabMm),
+          E = n(state.bs.equityMm);
+        const CA = n(state.bs.currentAssetsMm),
+          NCA = n(state.bs.nonCurrentAssetsMm);
+        const CL = n(state.bs.currentLiabilitiesMm),
+          NCL = n(state.bs.nonCurrentLiabilitiesMm);
+        const CS = n(state.bs.capitalStockMm),
+          RE = n(state.bs.retainedEarningsMm),
+          OE = Math.max(0, E - CS - RE);
+        const iDebt = n(state.bs.interestBearingDebtMm);
+        if (!A && (CA || NCA)) A = CA + NCA;
+        if (!L && (CL || NCL)) L = CL + NCL;
+        if (!E && (CS || RE || OE)) E = CS + RE + OE;
+        const pad = 14,
+          leftW = (W - pad * 3) * 0.58,
+          rightW = W - pad * 3 - leftW;
+        const assets = { x: pad, y: pad, w: leftW, h: H - pad * 2 };
+        const right = { x: pad * 2 + leftW, y: pad, w: rightW, h: H - pad * 2 };
+        const shapes = [];
+        // 資産
+        const aSum = CA + NCA || 1,
+          aCAh = assets.h * (CA / aSum),
+          aNCAh = assets.h - aCAh;
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.strokeRect(assets.x, assets.y, assets.w, assets.h);
+        ctx.fillStyle = '#9ec6ff';
+        ctx.fillRect(assets.x, assets.y, assets.w, aCAh);
+        ctx.fillStyle = '#5aa5ff';
+        ctx.fillRect(assets.x, assets.y + aCAh, assets.w, aNCAh);
+        labelBox('流動資産', CA, assets.x, assets.y, assets.w, aCAh, A);
+        labelBox(
+          '固定資産',
+          NCA,
+          assets.x,
+          assets.y + aCAh,
+          assets.w,
+          aNCAh,
+          A
+        );
+        title(
+          '資産 合計：' + fmt(A || CA + NCA) + ' 百万円',
+          assets.x,
+          assets.y - 6,
+          assets.w
+        );
+        // 右: 負債/純資産
+        const base = A > 0 ? A : Math.max(1, L + E);
+        const liabH = right.h * (L / base);
+        const eqH = right.h - liabH;
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.strokeRect(right.x, right.y, right.w, right.h);
+        const lSum = CL + NCL || 1,
+          lCLh = liabH * ((CL || 0) / lSum),
+          lNCLh = liabH - lCLh;
+        ctx.fillStyle = '#ffd0b9';
+        ctx.fillRect(right.x, right.y, right.w, lCLh);
+        ctx.fillStyle = '#ffb38a';
+        ctx.fillRect(right.x, right.y + lCLh, right.w, lNCLh);
+        labelBox('流動負債', CL, right.x, right.y, right.w, lCLh, A);
+        labelBox('固定負債', NCL, right.x, right.y + lCLh, right.w, lNCLh, A);
+        title(
+          '負債 合計：' +
+            fmt(L || CL + NCL) +
+            ' 百万円（有利子 ' +
+            fmt(iDebt) +
+            '）',
+          right.x,
+          right.y - 6,
+          right.w
+        );
+        const eqY = right.y + liabH;
+        const eSum = Math.max(1, CS + RE + OE || 1);
+        const eCS = eqH * (CS / eSum),
+          eRE = eqH * (RE / eSum),
+          eOE = eqH - eCS - eRE;
+        ctx.fillStyle = '#b8ecd9';
+        ctx.fillRect(right.x, eqY, right.w, eCS);
+        ctx.fillStyle = '#6dd3a9';
+        ctx.fillRect(right.x, eqY + eCS, right.w, eRE);
+        ctx.fillStyle = '#41b68f';
+        ctx.fillRect(right.x, eqY + eCS + eRE, right.w, eOE);
+        labelBox('資本金', CS, right.x, eqY, right.w, eCS, A, '#064e3b');
+        labelBox(
+          '利益剰余金',
+          RE,
+          right.x,
+          eqY + eCS,
+          right.w,
+          eRE,
+          A,
+          '#064e3b'
+        );
+        labelBox(
+          'その他純資産',
+          OE,
+          right.x,
+          eqY + eCS + eRE,
+          right.w,
+          eOE,
+          A,
+          '#064e3b'
+        );
+        title(
+          '純資産 合計：' + fmt(E || CS + RE + OE) + ' 百万円',
+          right.x,
+          eqY - 6,
+          right.w
+        );
+        c.onmousemove = (ev) => {
+          const ox = ev.offsetX,
+            oy = ev.offsetY;
+          const hit = shapes.find(
+            (s) => ox >= s.x && ox <= s.x + s.w && oy >= s.y && oy <= s.y + s.h
+          );
+          if (hit) showTip(hit.tip, ev.clientX, ev.clientY);
+          else hideTip();
+        };
+        c.onmouseleave = hideTip;
+        const A2 = A || CA + NCA,
+          L2 = L || CL + NCL,
+          E2 = E || CS + RE + OE;
+        document.getElementById(
+          'bsCheck'
+        ).textContent = `検証: 資産−(負債+純資産)=${fmt(
+          A2 - (L2 + E2)
+        )} / 自己資本比率=${A2 ? ((E2 / A2) * 100).toFixed(1) + '%' : '—'}`;
+        function labelBox(
+          title,
+          val,
+          x,
+          y,
+          w,
+          h,
+          total,
+          textColor = '#1f2937'
+        ) {
+          const minW = 84,
+            minH = 42;
+          if (w >= minW && h >= minH) {
+            const ctx2 = ctx;
+            ctx2.fillStyle = textColor;
+            ctx2.font = '12px system-ui';
+            ctx2.textBaseline = 'top';
+            ctx2.fillText(title, x + 6, y + 6);
+            ctx2.fillText(`${fmt(val)} 百万円`, x + 6, y + 24);
+          } else {
+            shapes.push({
+              x,
+              y,
+              w,
+              h,
+              tip: `<b>${title}</b><br>${fmt(val)} 百万円${
+                total
+                  ? '<br>総資産比 ' + ((val / total) * 100).toFixed(1) + '%'
+                  : ''
+              }`,
+            });
+          }
+        }
+        function title(text, x, y, w) {
+          ctx.fillStyle = '#1f2937';
+          ctx.font = '13px system-ui';
+          ctx.textAlign = 'center';
+          ctx.fillText(text, x + w / 2, clampY(y, 12, H - 18));
+        }
+      }
+
+      /* ===== CF ===== */
+      const CF_PATTERN = {
+        '+--': { name: '健全型' },
+        '+-+': { name: '積極型' },
+        '+++': { name: '安定型' },
+        '++-': { name: '改善型' },
+        '--+': { name: '勝負型' },
+        '-+-': { name: 'リストラ型' },
+        '---': { name: '大幅見直し型' },
+        '-++': { name: '救済型' },
+      };
+      const sgn = (v) => (v >= 0 ? '+' : '-');
+      function calcDerived() {
+        const cfo = n(state.cf.cfoOku),
+          cfi = n(state.cf.cfiOku),
+          cff = n(state.cf.cffOku);
+        state.cf.totalOku = cfo + cfi + cff;
+        const pat = CF_PATTERN[sgn(cfo) + sgn(cfi) + sgn(cff)];
+        state.cf.pattern = pat ? pat.name : '—';
+      }
+      function drawCF() {
+        const c = document.getElementById('cfCanvas');
+        const rect = c.getBoundingClientRect();
+        const ctx = setupCanvas(c, rect.width, rect.height);
+        const W = rect.width,
+          H = rect.height;
+        clear(ctx, W, H);
+        document.querySelector('[data-bind="cf.totalOku"]').value =
+          state.cf.totalOku ?? '';
+        document.querySelector('[data-bind="cf.pattern"]').value =
+          state.cf.pattern ?? '—';
+        const data = [
+          { name: '営業CF', v: n(state.cf.cfoOku) },
+          { name: '投資CF', v: n(state.cf.cfiOku) },
+          { name: '財務CF', v: n(state.cf.cffOku) },
+          { name: '合計', v: n(state.cf.totalOku), total: true },
+        ];
+        const maxAbs = Math.max(1, ...data.map((d) => Math.abs(d.v)));
+        const M = { l: 50, r: 20, t: 26, b: 46 };
+        const zeroY = H - M.b - ((0 + maxAbs) / (maxAbs * 2)) * (H - M.t - M.b);
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath();
+        ctx.moveTo(M.l, zeroY);
+        ctx.lineTo(W - M.r, zeroY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        const barW = Math.min(90, ((W - M.l - M.r) / data.length) * 0.6),
+          gap = (W - M.l - M.r) / data.length;
+        const shapes = [];
+        data.forEach((d, i) => {
+          const x = M.l + i * gap + (gap - barW) / 2;
+          const h = (Math.abs(d.v) / (maxAbs * 2)) * (H - M.t - M.b) * 2;
+          const y = d.v >= 0 ? zeroY - h : zeroY;
+          const color = d.total ? '#95a5a6' : d.v >= 0 ? '#60a5fa' : '#f87171';
+          ctx.fillStyle = color;
+          rrect(ctx, x, y, barW, h, 6);
+          ctx.fill();
+          if (h > 20) {
+            ctx.fillStyle = '#374151';
+            ctx.font = '12px system-ui';
+            ctx.textAlign = 'center';
+            const ty = clampY(d.v >= 0 ? y - 6 : y + h + 14, 12, H - 18);
+            ctx.fillText(fmt(d.v), x + barW / 2, ty);
+          }
+          ctx.fillStyle = '#374151';
+          ctx.font = '12px system-ui';
+          ctx.textAlign = 'center';
+          ctx.fillText(d.name, x + barW / 2, H - 18);
+          shapes.push({
+            x,
+            y,
+            w: barW,
+            h,
+            tip: `<b>${d.name}</b><br>${fmt(d.v)} 億円`,
+          });
+        });
+        c.onmousemove = (ev) => {
+          const { x, y } = ev;
+          const ox = ev.offsetX,
+            oy = ev.offsetY;
+          const hit = shapes.find(
+            (s) => ox >= s.x && ox <= s.x + s.w && oy >= s.y && oy <= s.y + s.h
+          );
+          if (hit) showTip(hit.tip, x, y);
+          else hideTip();
+        };
+        c.onmouseleave = hideTip;
+      }
+
+      /* ===== Markdown preview ===== */
+      const esc = (s) =>
+        s.replace(
+          /[&<>"]/g,
+          (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])
+        );
+      function md2html(src) {
+        let s = esc(src || '');
+        s = s.replace(/^### (.*)$/gm, '<h3>$1<\/h3>');
+        s = s.replace(/^## (.*)$/gm, '<h2>$1<\/h2>');
+        s = s.replace(/^# (.*)$/gm, '<h1>$1<\/h1>');
+        s = s.replace(/(^|\n)- (.*)(?=\n|$)/g, '$1<li>$2<\/li>');
+        s = s.replace(/(?:<li>[\s\S]*?<\/li>)/g, (m) => `<ul>${m}<\/ul>`);
+        s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1<\/strong>');
+        s = s.replace(/\*(.+?)\*/g, '<em>$1<\/em>');
+        s = s.replace(/(^|\n)(?!<\/?(h\d|ul|li)>)([^\n].+)/g, '$1<p>$3<\/p>');
+        return s;
+      }
+      function renderMemo() {
+        const src = document.getElementById('memo').value || '';
+        document.getElementById('memoPreview').innerHTML = md2html(src);
+      }
+
+      /* ===== 再描画 ===== */
+      function renderAll() {
+        renderKPIs();
+        renderBench();
+        drawPL();
+        drawBS();
+        drawCF();
+        renderMemo();
+      }
+      window.addEventListener('resize', renderAll);
+
+      /* 初期化 */
+      calcDerived();
+      renderAll();
+    </script>
+  </body>
+</html>
