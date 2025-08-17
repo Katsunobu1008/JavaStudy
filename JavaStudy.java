@@ -231,7 +231,25 @@ public class JavaStudy {
         //     else{System.out.println(i);}
 
 
-        // }
+        // }  BankAccount taro = new BankAccount("001", "山田太郎", 10_000);
+        BankAccount hanako = new BankAccount("002", "佐藤花子", 5_000);
+
+        System.out.println(taro);
+        System.out.println(hanako);
+
+        // 入出金の練習
+        taro.deposit(2_500);     // → 成功
+        taro.withdraw(13_000);   // → 失敗（残高不足の例）
+        taro.withdraw(3_000);    // → 成功
+
+        // 振込の練習
+        taro.transferTo(hanako, 2_000); // 太郎→花子
+
+        System.out.println("--- 最終残高 ---");
+        System.out.println(taro);
+        System.out.println(hanako);
+    }
+    
 
 
     }
