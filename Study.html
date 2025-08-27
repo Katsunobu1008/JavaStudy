@@ -1,24 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Study Page</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header>
-      <h1>Study Page</h1>
-    </header>
-    <main>
-      <section>
-        <h2>Welcome to the Study Page</h2>
-        <p>This is where you can find study materials and resources.</p>
-        <p>勝信</p>
-      </section>
-    </main>
-    <footer>
-      <p>&copy; 2024 Study Resources</p>
-    </footer>
-  </body>
-</html>
+diff --git a/Study.html b/Study.html
+index 777e04d58b5c158f6f601687ca7189b5e261af17..0cd077fc3ddee117bf736e20808da56d0d6e4d79 100644
+--- a/Study.html
++++ b/Study.html
+@@ -1,24 +1,42 @@
+ <!DOCTYPE html>
+ <html lang="en">
+   <head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Study Page</title>
+     <link rel="stylesheet" href="styles.css" />
+   </head>
+   <body>
+     <header>
+       <h1>Study Page</h1>
++      <nav>
++        <a href="#home">Home</a>
++        <a href="#resources">Resources</a>
++        <a href="#contact">Contact</a>
++      </nav>
+     </header>
+     <main>
+-      <section>
++      <section id="home">
+         <h2>Welcome to the Study Page</h2>
+-        <p>This is where you can find study materials and resources.</p>
+-        <p>勝信</p>
++        <p>Find study materials and resources to enhance your learning.</p>
++        <button id="startButton">Get Started</button>
++      </section>
++      <section id="resources">
++        <h2>Resources</h2>
++        <ul>
++          <li>Example resource 1</li>
++          <li>Example resource 2</li>
++          <li>Example resource 3</li>
++        </ul>
++      </section>
++      <section id="contact">
++        <h2>Contact</h2>
++        <p>Email: contact@example.com</p>
+       </section>
+     </main>
+     <footer>
+       <p>&copy; 2024 Study Resources</p>
+     </footer>
++    <script src="script.js"></script>
+   </body>
+ </html>
