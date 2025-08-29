@@ -1,46 +1,105 @@
+:root {
+  --brand: #4caf50;
+  --brand-700: #3d8b40;
+  --text: #1f2937;
+  --bg: #ffffff;
+  --muted-bg: #f4f4f4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: Arial, sans-serif;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans JP',
+    Arial, sans-serif;
   margin: 0;
-  padding: 0;
+  color: var(--text);
+  background: var(--bg);
   line-height: 1.6;
 }
 
-header {
-  background: #4caf50;
-  color: white;
-  padding: 1rem;
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 8px;
+  padding: 0.5rem 0.75rem;
+  background: var(--brand);
+  color: #fff;
+  border-radius: 0.5rem;
+}
+.skip-link:focus {
+  top: 8px;
 }
 
-nav a {
-  color: white;
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--brand);
+  color: #fff;
+  padding: 1rem;
+}
+.site-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+.primary-nav a {
+  color: #fff;
   margin-right: 1rem;
   text-decoration: none;
 }
-
-main {
-  padding: 1rem;
-  max-width: 800px;
-  margin: auto;
+.primary-nav a:focus,
+.primary-nav a:hover {
+  text-decoration: underline;
 }
 
-section {
+.container {
+  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.section {
   margin-bottom: 2rem;
 }
 
-button {
+.btn {
   padding: 0.5rem 1rem;
-  background: #4caf50;
+  background: var(--brand);
   border: none;
-  color: white;
+  color: #fff;
+  border-radius: 0.5rem;
   cursor: pointer;
 }
-
-button:hover {
-  background: #45a049;
+.btn:hover,
+.btn:focus {
+  background: var(--brand-700);
 }
 
-footer {
+.list {
+  padding-left: 1.25rem;
+}
+
+.site-footer {
   text-align: center;
-  background: #f4f4f4;
+  background: var(--muted-bg);
   padding: 1rem;
+}
+
+/* ダークモード対応（任意） */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #e5e7eb;
+    --bg: #0b0b0b;
+    --muted-bg: #111;
+  }
+  .site-footer {
+    color: var(--text);
+  }
 }

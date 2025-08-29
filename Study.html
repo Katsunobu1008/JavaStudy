@@ -1,50 +1,55 @@
-diff --git a/Study.html b/Study.html
-index 777e04d58b5c158f6f601687ca7189b5e261af17..0cd077fc3ddee117bf736e20808da56d0d6e4d79 100644
---- a/Study.html
-+++ b/Study.html
-@@ -1,24 +1,42 @@
- <!DOCTYPE html>
- <html lang="en">
-   <head>
-     <meta charset="UTF-8" />
-     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <title>Study Page</title>
-     <link rel="stylesheet" href="styles.css" />
-   </head>
-   <body>
-     <header>
-       <h1>Study Page</h1>
-+      <nav>
-+        <a href="#home">Home</a>
-+        <a href="#resources">Resources</a>
-+        <a href="#contact">Contact</a>
-+      </nav>
-     </header>
-     <main>
--      <section>
-+      <section id="home">
-         <h2>Welcome to the Study Page</h2>
--        <p>This is where you can find study materials and resources.</p>
--        <p>勝信</p>
-+        <p>Find study materials and resources to enhance your learning.</p>
-+        <button id="startButton">Get Started</button>
-+      </section>
-+      <section id="resources">
-+        <h2>Resources</h2>
-+        <ul>
-+          <li>Example resource 1</li>
-+          <li>Example resource 2</li>
-+          <li>Example resource 3</li>
-+        </ul>
-+      </section>
-+      <section id="contact">
-+        <h2>Contact</h2>
-+        <p>Email: contact@example.com</p>
-       </section>
-     </main>
-     <footer>
-       <p>&copy; 2024 Study Resources</p>
-     </footer>
-+    <script src="script.js"></script>
-   </body>
- </html>
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="学習用の資料とリソースのまとめページ" />
+    <title>Study Page</title>
+    <!-- キャッシュ対策に ?v=1 を付与 -->
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">本文へスキップ</a>
+
+    <header class="site-header">
+      <h1 class="site-title">Study Page</h1>
+      <nav class="primary-nav" aria-label="メインナビゲーション">
+        <a href="#home" aria-current="page">Home</a>
+        <a href="#resources">Resources</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main id="main" class="container">
+      <section id="home" class="section">
+        <h2>Welcome to the Study Page</h2>
+        <p>This is where you can find study materials and resources.</p>
+        <p>勝信</p>
+        <p>Find study materials and resources to enhance your learning.</p>
+        <button id="startButton" class="btn">Get Started</button>
+      </section>
+
+      <section id="resources" class="section">
+        <h2>Resources</h2>
+        <ul class="list">
+          <li>Example resource 1</li>
+          <li>Example resource 2</li>
+          <li>Example resource 3</li>
+        </ul>
+      </section>
+
+      <section id="contact" class="section">
+        <h2>Contact</h2>
+        <p>
+          Email: <a href="mailto:contact@example.com">contact@example.com</a>
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Study Resources</p>
+    </footer>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>
