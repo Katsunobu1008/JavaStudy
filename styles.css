@@ -5,7 +5,7 @@
 @layer base {
   :root {
     color-scheme: light dark; /* UAのフォーム配色などに効く */
-    --brand: #2e7d32;
+    --brand: #111e3f;
     --brand-700: #246428;
     --bg: #ffffff;
     --text: #1f2937;
