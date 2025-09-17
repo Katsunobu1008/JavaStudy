@@ -1,4 +1,4 @@
-﻿package com.picsy.domain;
+package com.picsy.domain;
 
 /**
  * Lifecycle flag used to manage active, deceased, or otherwise disabled members.

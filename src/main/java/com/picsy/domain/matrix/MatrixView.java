@@ -1,4 +1,4 @@
-﻿package com.picsy.domain.matrix;
+package com.picsy.domain.matrix;
 
 /**
  * Convenience payload for synchronising matrix state with the client UI.

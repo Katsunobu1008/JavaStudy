@@ -1,4 +1,4 @@
-﻿package com.picsy.config;
+package com.picsy.config;
 
 import com.picsy.domain.CommunityFactory;
 import com.picsy.domain.CommunityState;

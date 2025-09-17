@@ -1,4 +1,4 @@
-﻿package com.picsy.domain;
+package com.picsy.domain;
 
 import com.picsy.domain.config.NaturalRecoveryConfig;
 import com.picsy.domain.matrix.MatrixView;

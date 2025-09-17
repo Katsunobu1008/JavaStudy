@@ -1,4 +1,4 @@
-﻿package com.picsy.domain;
+package com.picsy.domain;
 
 /**
  * High-level classification for actors within the PICSY economy.

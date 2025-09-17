@@ -1,4 +1,4 @@
-﻿package com.picsy.domain.matrix;
+package com.picsy.domain.matrix;
 
 /**
  * Produces the virtual-central-bank transformed matrix E' used for contribution calculations.

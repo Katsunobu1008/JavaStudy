@@ -1,4 +1,4 @@
-﻿package com.picsy.domain.matrix;
+package com.picsy.domain.matrix;
 
 import java.util.Arrays;
 

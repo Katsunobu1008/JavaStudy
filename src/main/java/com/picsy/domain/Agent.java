@@ -1,4 +1,4 @@
-﻿package com.picsy.domain;
+package com.picsy.domain;
 
 import java.time.Instant;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-﻿package com.picsy.domain.config;
+package com.picsy.domain.config;
 
 import java.time.Duration;
 
