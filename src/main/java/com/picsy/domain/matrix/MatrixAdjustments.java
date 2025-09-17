@@ -1,17 +1,20 @@
 package com.picsy.domain.matrix;
 
-/**
- * Applies model-specific matrix adjustments such as natural recovery and transactions.
- */
+import java.util.Arrays;
+
 public final class MatrixAdjustments {
 
     private MatrixAdjustments() {}
 
-    public static double[][] applyNaturalRecovery(double[][] matrix, double gamma) {
+    public static double[][] applyNaturalRecovery(double[][] matrix, double gamma, boolean[] activeFlags) {
         int n = matrix.length;
         double[][] adjusted = MatrixUtils.copy(matrix);
         double retainFactor = 1d - gamma;
         for (int i = 0; i < n; i++) {
+            boolean isActive = activeFlags == null || activeFlags.length <= i || activeFlags[i];
+            if (!isActive) {
+                continue;
+            }
             double diagonal = adjusted[i][i];
             double newDiagonal = diagonal + gamma * (1d - diagonal);
             adjusted[i][i] = newDiagonal;
@@ -23,6 +26,10 @@ public final class MatrixAdjustments {
             }
         }
         return adjusted;
+    }
+
+    public static double[][] applyNaturalRecovery(double[][] matrix, double gamma) {
+        return applyNaturalRecovery(matrix, gamma, null);
     }
 
     public static double[][] applyTransaction(double[][] matrix, int buyerIndex, int sellerIndex, double amount) {
