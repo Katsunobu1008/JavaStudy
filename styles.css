@@ -1,248 +1,243 @@
-/* 1) カスケードレイヤーで上書き順を制御（base → components → utilities） */
+/* 1) カスケードレイヤー: スタイルの詳細度に関わらず、読み込み順を定義します。これにより、意図しないスタイルの上書きを防ぎます。
+   ここでは、基本スタイル(base) → コンポーネント(components) → 補助的なスタイル(utilities) の順で適用されるように設定しています。*/
 @layer base, components, utilities;
 
 /* ========== base: リセット/トークン/基本タイポ ========== */
+/* 'base'レイヤーにスタイルを定義します */
 @layer base {
+  /* :rootセレクタはHTMLのルート要素(<html>)を選択します。ここにCSSカスタムプロパティ（変数）を定義します。 */
   :root {
-    color-scheme: light dark; /* UAのフォーム配色などに効く */
-    --brand: #111e3f;
-    --brand-700: #246428;
-    --bg: #ffffff;
-    --text: #1f2937;
-    --muted: #f4f4f5;
-    --border: #e5e7eb;
-    --space: 1rem;
-    --radius: 0.75rem;
+    /* color-schemeプロパティ: ブラウザにこのサイトがライトテーマとダークテーマの両方をサポートすることを伝えます。
+       これにより、フォームの部品などがOSのテーマに合わせて自動的にスタイル調整されます。 */
+    color-scheme: light dark;
+    /* CSSカスタムプロパティ（変数）の定義。--から始まる名前で、var()関数で再利用できます。 */
+    --brand: #111e3f; /* ブランドカラー */
+    --brand-700: #246428; /* ブランドカラーの濃い色 */
+    --bg: #ffffff; /* 背景色 */
+    --text: #1f2937; /* テキスト色 */
+    --muted: #f4f4f5; /* やや薄い背景色（フッターなどで使用） */
+    --border: #e5e7eb; /* 境界線の色 */
+    --space: 1rem; /* 基本的な余白の単位 */
+    --radius: 0.75rem; /* 角丸の半径 */
   }
-  /* ダークテーマは data-theme で切替（JSで操作） */
+  /* ダークテーマ用のスタイル。html要素に data-theme="dark" 属性が付与された場合に適用されます。 */
   :root[data-theme='dark'] {
+    /* ダークテーマ用の色を上書きします */
     --bg: #0b0b0b;
     --text: #e5e7eb;
     --muted: #111;
     --border: #222;
-    --brand: #60a5fa; /* ダークでは少し軽い彩度に */
+    --brand: #60a5fa; /* ダークテーマでは、明るい青色をブランドカラーにします */
     --brand-700: #3b82f6;
   }
 
+  /* 全ての要素(*)に適用するスタイル（ユニバーサルセレクタ） */
   * {
+    /* paddingとborderを要素の幅(width)と高さ(height)に含めるようにします。レイアウト計算が直感的になります。 */
     box-sizing: border-box;
   }
+  /* html要素のスタイル */
   html {
+    /* ページ内リンクをクリックした際に、スムーズにスクロールするようにします */
     scroll-behavior: smooth;
+    /* フォントサイズを可変にします。clamp(最小値, 推奨値, 最大値)を使い、画面幅に応じて滑らかに変化させます。 */
     font-size: clamp(16px, 1.2vw, 18px);
   }
+  /* body要素のスタイル */
   body {
-    margin: 0;
+    margin: 0; /* ブラウザがデフォルトで設定するbodyの余白をなくします */
+    /* フォントファミリーを指定します。左から順に優先され、システムにインストールされているフォントが使われます。 */
     font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans JP',
       sans-serif;
-    line-height: 1.7;
-    background: var(--bg);
-    color: var(--text);
+    line-height: 1.7; /* 行の高さをフォントサイズの1.7倍に設定し、読みやすくします */
+    background: var(--bg); /* 背景色をカスタムプロパティで指定します */
+    color: var(--text); /* テキスト色をカスタムプロパティで指定します */
   }
 
+  /* a(リンク)要素のスタイル */
   a {
-    color: var(--brand);
+    color: var(--brand); /* リンクの色をブランドカラーにします */
   }
+  /* a要素がホバーされた時、またはキーボードでフォーカスされた時に適用するスタイル */
   a:where(:hover, :focus-visible) {
-    text-decoration: underline;
+    text-decoration: underline; /* 下線を引きます */
   }
+  /* キーボード操作でフォーカスが当たった要素に適用するスタイル。アクセシビリティ向上のためです。 */
   :focus-visible {
-    outline: 2px solid #60a5fa;
-    outline-offset: 2px;
+    outline: 2px solid #60a5fa; /* 青いアウトラインを表示します */
+    outline-offset: 2px; /* アウトラインを要素から少し離します */
   }
 
-  .skip-link {
-    position: absolute;
-    left: 8px;
-    top: -40px;
-    background: var(--brand);
-    color: #fff;
-    padding: 0.4rem 0.6rem;
-    border-radius: 0.4rem;
-  }
-  .skip-link:focus-visible {
-    top: 8px;
-  }
-
+  /* ヘッダーのスタイル */
   .site-header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 0.75rem;
-    align-items: center;
-    padding: 0.75rem var(--space);
-    background: var(--brand);
-    color: #fff;
+    position: sticky; /* スクロールしても画面上部に固定されます */
+    top: 0; /* 画面の上端から0pxの位置に固定します */
+    z-index: 10; /* 他の要素より手前に表示されるように、重ね順を指定します */
+    display: grid; /* Gridレイアウトを適用します */
+    grid-template-columns: 1fr auto auto; /* 3つの列を定義します。1frは残りの幅を全て使い、autoはコンテンツの幅に合わせます */
+    gap: 0.75rem; /* グリッドアイテム間の余白 */
+    align-items: center; /* アイテムを垂直方向の中央に揃えます */
+    padding: 0.75rem var(--space); /* 上下と左右のパディング */
+    background: var(--brand); /* 背景色をブランドカラーにします */
+    color: #fff; /* テキスト色を白にします */
   }
+  /* ヘッダー内のロゴのスタイル */
   .site-header .logo {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 700;
+    color: #fff; /* テキスト色を白にします */
+    text-decoration: none; /* 下線を消します */
+    font-weight: 700; /* フォントを太字にします */
   }
+  /* ナビゲーションのリストのスタイル */
   .primary-nav ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    gap: 0.75rem;
+    margin: 0; /* 余白をなくします */
+    padding: 0; /* パディングをなくします */
+    list-style: none; /* リストのマーカー（点）を消します */
+    display: flex; /* Flexboxレイアウトを適用し、子要素を横並びにします */
+    gap: 0.75rem; /* アイテム間の余白 */
   }
+  /* ナビゲーションのリンクのスタイル */
   .primary-nav a {
-    color: #fff;
-    text-decoration: none;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.4rem;
+    color: #fff; /* テキスト色を白にします */
+    text-decoration: none; /* 下線を消します */
+    padding: 0.25rem 0.5rem; /* パディング */
+    border-radius: 0.4rem; /* 角を丸くします */
   }
+  /* 現在のページを示すリンクのスタイル */
   .primary-nav a[aria-current='page'] {
-    background: #ffffff22;
+    background: #ffffff22; /* 半透明の白を背景色にします */
   }
+  /* ボタンの基本スタイル */
   .btn {
-    background: #fff2;
-    color: #fff;
-    border: 1px solid #fff4;
-    border-radius: 0.6rem;
-    padding: 0.45rem 0.75rem;
-    cursor: pointer;
+    background: #fff2; /* 半透明の白を背景色にします */
+    color: #fff; /* テキスト色を白にします */
+    border: 1px solid #fff4; /* 半透明の白で境界線を引きます */
+    border-radius: 0.6rem; /* 角を丸くします */
+    padding: 0.45rem 0.75rem; /* パディング */
+    cursor: pointer; /* カーソルをポインター（指の形）にします */
   }
+  /* プライマリボタンのスタイル */
   .btn--primary {
-    background: #fff;
-    color: var(--brand-700);
-    border-color: transparent;
+    background: #fff; /* 背景色を白にします */
+    color: var(--brand-700); /* テキスト色を濃いブランドカラーにします */
+    border-color: transparent; /* 境界線を透明にします */
   }
+  /* ボタンがホバーまたはフォーカスされた時のスタイル */
   .btn:where(:hover, :focus-visible) {
-    filter: brightness(1.1);
+    filter: brightness(1.1); /* 明るさを少し上げます */
   }
 
+  /* メインコンテンツとサイドバーを囲むコンテナのスタイル */
   .container {
-    max-width: 1100px;
-    margin-inline: auto;
-    padding: var(--space);
-    display: grid;
-    gap: var(--space);
-    grid-template-columns: 1fr; /* モバイル：1カラム */
+    max-width: 1100px; /* 最大幅を1100pxに制限します */
+    margin-inline: auto; /* 左右の余白をautoにし、中央揃えにします */
+    padding: var(--space); /* パディング */
+    display: grid; /* Gridレイアウトを適用します */
+    gap: var(--space); /* グリッドアイテム間の余白 */
+    grid-template-columns: 1fr; /* モバイルでは1カラムレイアウトにします */
   }
+  /* メディアクエリ: 画面幅が960px以上の場合に適用されます */
   @media (min-width: 960px) {
     .container {
+      /* PCではメイン(3fr)とサイドバー(1fr)の2カラムレイアウトにします */
       grid-template-columns: 3fr 1fr;
-    } /* PC：メイン＋サイド */
+    }
     .aside {
+      /* サイドバーをグリッドの2列目に配置します */
       grid-column: 2;
     }
   }
 
-  .section {
-    grid-column: 1 / -1;
-  }
+  /* ヒーローイメージの画像のスタイル */
   .hero-media img {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: var(--radius);
-  }
-  .cta-row {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-  }
-  .list {
-    padding-left: 1.25rem;
+    width: 100%; /* 親要素の幅いっぱいに広げます */
+    height: auto; /* 高さを自動調整してアスペクト比を保ちます */
+    display: block; /* 画像の下にできる余分な隙間をなくします */
+    border-radius: var(--radius); /* 角を丸くします */
   }
 
+  /* リストのスタイル */
+  .list {
+    padding-left: 1.25rem; /* 左側のパディングを調整して、リストマーカーの位置を調整します */
+  }
+
+  /* フッターのスタイル */
   .site-footer {
-    text-align: center;
-    background: var(--muted);
-    padding: 1rem;
+    text-align: center; /* テキストを中央揃えにします */
+    background: var(--muted); /* 背景色を薄い色にします */
+    padding: 1rem; /* パディング */
   }
 }
 
 /* ========== components: 再利用コンポーネント ========== */
+/* 'components'レイヤーにスタイルを定義します */
 @layer components {
-  /* カード群の“親”にコンテナを設定 → 子の @container で分岐 */
+  /* カード群の親要素(.cards)のスタイル */
   .cards {
-    display: grid;
-    gap: var(--space);
+    display: grid; /* Gridレイアウトを適用します */
+    gap: var(--space); /* アイテム間の余白 */
+    /* この要素をコンテナクエリのコンテナとして定義します。inline-sizeは幅を基準にすることを意味します。 */
     container-type: inline-size;
   }
-  /* コンテナクエリ：親（.cards）の幅で列数を切替（ページ幅ではなく“親の幅”基準） */
+  /* コンテナクエリ: 親要素(.cards)の幅が560px以上の場合に適用されます */
   @container (min-width: 560px) {
     .cards {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, 1fr); /* 2カラムレイアウトにします */
     }
   }
+  /* コンテナクエリ: 親要素(.cards)の幅が900px以上の場合に適用されます */
   @container (min-width: 900px) {
     .cards {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, 1fr); /* 3カラムレイアウトにします */
     }
   }
 
+  /* カード自体のスタイル */
   .card {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: var(--space);
+    background: var(--bg); /* 背景色 */
+    border: 1px solid var(--border); /* 境界線 */
+    border-radius: var(--radius); /* 角丸 */
+    padding: var(--space); /* パディング */
   }
+  /* 記事カードのヘッダーのスタイル */
   .post__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 0.5rem;
+    display: flex; /* Flexboxレイアウトを適用します */
+    justify-content: space-between; /* 両端揃えにします */
+    align-items: baseline; /* テキストのベースラインを揃えます */
+    gap: 0.5rem; /* アイテム間の余白 */
   }
+  /* 記事のメタ情報（日付など）のスタイル */
   .post__meta {
-    color: #6b7280;
-    font-size: 0.9em;
+    color: #6b7280; /* テキスト色をグレーにします */
+    font-size: 0.9em; /* フォントサイズを少し小さくします */
   }
+  /* 記事カードのフッターのスタイル */
   .post__footer {
-    display: flex;
-    justify-content: flex-end;
-  }
-  .icon-btn {
-    all: unset;
-    cursor: pointer;
-    padding: 0.25rem 0.45rem;
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-  }
-  .icon-btn[aria-pressed='true'] {
-    background: #fde68a;
-  } /* いいねON */
-  .details {
-    margin-top: 1rem;
-    border: 1px dashed var(--border);
-    border-radius: var(--radius);
-    padding: 0.5rem 1rem;
-  }
-  .kv {
-    display: grid;
-    gap: 0.5rem 1rem;
-    grid-template-columns: minmax(10ch, 1fr) 2fr;
-  }
-  .kv dt {
-    font-weight: 600;
-  }
-  .kv dd {
-    margin: 0;
+    display: flex; /* Flexboxレイアウトを適用します */
+    justify-content: flex-end; /* 右端揃えにします */
   }
 }
 
 /* ========== utilities: 小さな補助クラス ========== */
+/* 'utilities'レイヤーにスタイルを定義します */
 @layer utilities {
+  /* スクリーンリーダー用のクラス。視覚的には非表示にしますが、スクリーンリーダーは読み上げることができます。 */
   .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+    position: absolute; /* 通常のレイアウトフローから外します */
+    width: 1px; /* 幅を1pxにします */
+    height: 1px; /* 高さを1pxにします */
+    padding: 0; /* パディングを0にします */
+    margin: -1px; /* 画面外に押し出します */
+    overflow: hidden; /* はみ出した部分を隠します */
+    clip: rect(0, 0, 0, 0); /* 表示領域を0にします */
+    white-space: nowrap; /* テキストの折り返しを無効にします */
+    border: 0; /* 境界線をなくします */
   }
 }
 
-/* 動きが苦手な人の設定を尊重 */
+/* ユーザーがOS/ブラウザで「動きを減らす」設定をしている場合に適用されます */
 @media (prefers-reduced-motion: reduce) {
   html {
+    /* スムーズスクロールを無効にし、瞬時に移動するようにします */
     scroll-behavior: auto;
   }
 }

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Study Page</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="#" class="logo">Web Site</a>
+      <nav class="primary-nav">
+        <ul>
+          <li><a href="#" aria-current="page">ホーム</a></li>
+          <li><a href="#">記事一覧</a></li>
+          <li><a href="#">お問い合わせ</a></li>
+        </ul>
+      </nav>
+      <button class="btn" id="theme-toggle">テーマ切替</button>
+    </header>
+
+    <main class="container">
+      <div class="main-content">
+        <section class="section hero-media">
+          <img
+            src="https://picsum.photos/seed/website/1200/400"
+            alt="ランダムな風景画像"
+            width="1200"
+            height="400"
+          />
+        </section>
+
+        <section class="section">
+          <h2>最新の記事</h2>
+          <div class="cards">
+            <article class="card">
+              <header class="post__header">
+                <h3><a href="#">記事タイトル 1</a></h3>
+                <time class="post__meta" datetime="2025-09-22"
+                  >2025年9月22日</time
+                >
+              </header>
+              <p>
+                これは記事の抜粋です。このカードはコンテナクエリによって、親要素の幅に応じてレイアウトが変化します。
+              </p>
+              <footer class="post__footer">
+                <a href="#" class="btn btn--primary">続きを読む</a>
+              </footer>
+            </article>
+            <article class="card">
+              <header class="post__header">
+                <h3><a href="#">記事タイトル 2</a></h3>
+                <time class="post__meta" datetime="2025-09-21"
+                  >2025年9月21日</time
+                >
+              </header>
+              <p>
+                これは記事の抜粋です。カードコンポーネントは再利用可能な部品として設計されています。
+              </p>
+              <footer class="post__footer">
+                <a href="#" class="btn btn--primary">続きを読む</a>
+              </footer>
+            </article>
+            <article class="card">
+              <header class="post__header">
+                <h3><a href="#">記事タイトル 3</a></h3>
+                <time class="post__meta" datetime="2025-09-20"
+                  >2025年9月20日</time
+                >
+              </header>
+              <p>
+                これは記事の抜粋です。CSSの@layerを使用して、スタイルの優先順位を管理しています。
+              </p>
+              <footer class="post__footer">
+                <a href="#" class="btn btn--primary">続きを読む</a>
+              </footer>
+            </article>
+          </div>
+        </section>
+      </div>
+
+      <aside class="aside">
+        <section class="card">
+          <h2>プロフィール</h2>
+          <p>
+            ここに自己紹介文が入ります。サイドバーのコンテンツはPC幅の時だけ表示されます。
+          </p>
+        </section>
+        <section class="card">
+          <h2>カテゴリー</h2>
+          <ul class="list">
+            <li><a href="#">HTML</a></li>
+            <li><a href="#">CSS</a></li>
+            <li><a href="#">JavaScript</a></li>
+          </ul>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2025 My Website. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+      const themeToggle = document.getElementById('theme-toggle');
+      const root = document.documentElement;
+
+      themeToggle.addEventListener('click', () => {
+        const isDark = root.getAttribute('data-theme') === 'dark';
+        root.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      });
+    </script>
+  </body>
+</html>
