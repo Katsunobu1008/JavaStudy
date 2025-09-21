@@ -1,27 +1,48 @@
+<!-- HTML5の文書であることを宣言します -->
 <!DOCTYPE html>
+<!-- html要素。lang="ja"で、このページの主要言語が日本語であることを示します -->
 <html lang="ja">
+  <!-- headセクション。ページのメタ情報（文字コード、タイトルなど）や外部ファイルの読み込みを指定します -->
   <head>
+    <!-- 文字エンコーディングをUTF-8に設定します。文字化けを防ぐために重要です -->
     <meta charset="UTF-8" />
+    <!-- viewport設定。スマートフォンなどのデバイスで表示を最適化します。width=device-widthはデバイスの幅に合わせ、initial-scale=1.0は初期ズーム倍率を1に設定します -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- ブラウザのタブに表示されるページのタイトルです -->
     <title>Study Page</title>
+    <!-- 外部のCSSファイルを読み込みます。href="styles.css"で同じ階層にあるstyles.cssを適用します -->
     <link rel="stylesheet" href="styles.css" />
   </head>
+  <!-- bodyセクション。実際にブラウザに表示されるコンテンツを記述します -->
   <body>
+    <!-- header要素。サイトのヘッダー（上部）部分。class="site-header"でCSSのスタイルを適用します -->
     <header class="site-header">
+      <!-- a要素（アンカータグ）。リンクを作成します。class="logo"でロゴ用のスタイルを適用します -->
       <a href="#" class="logo">Web Site</a>
+      <!-- nav要素。ナビゲーションメニューのセクションです。class="primary-nav"で主要なナビゲーションであることを示します -->
       <nav class="primary-nav">
+        <!-- ul要素。順序のないリストを作成します -->
         <ul>
-          <li><a href="#" aria-current="page">ホーム</a></li>
+          <!-- li要素。リストの各項目です -->
+          <li>
+            <!-- a要素。aria-current="page"は、このリンクが現在のページであることをスクリーンリーダーなどの支援技術に伝えます -->
+            <a href="#" aria-current="page">ホーム</a>
+          </li>
           <li><a href="#">記事一覧</a></li>
           <li><a href="#">お問い合わせ</a></li>
         </ul>
       </nav>
+      <!-- button要素。クリック可能なボタンを作成します。id="theme-toggle"でJavaScriptから操作するための識別子を付けます -->
       <button class="btn" id="theme-toggle">テーマ切替</button>
     </header>
 
+    <!-- main要素。ページの主要なコンテンツ部分です。class="container"で中央揃えや幅制限などのスタイルを適用します -->
     <main class="container">
+      <!-- div要素。メインコンテンツをまとめるための汎用的なコンテナです。class="main-content"でスタイルを適用します -->
       <div class="main-content">
+        <!-- section要素。ページの独立したセクションです。class="hero-media"でヒーローイメージ（目を引く大きな画像）用のスタイルを適用します -->
         <section class="section hero-media">
+          <!-- img要素。画像を表示します。srcで画像のURL、altで代替テキスト（画像が表示されない場合やスクリーンリーダー用）、widthとheightで画像のサイズを指定します -->
           <img
             src="https://picsum.photos/seed/website/1200/400"
             alt="ランダムな風景画像"
@@ -30,23 +51,34 @@
           />
         </section>
 
+        <!-- section要素。最新記事のセクションです -->
         <section class="section">
+          <!-- h2要素。セクションの見出しです -->
           <h2>最新の記事</h2>
+          <!-- div要素。カード群をまとめるコンテナです。class="cards"でカードレイアウト用のスタイル（Gridなど）を適用します -->
           <div class="cards">
+            <!-- article要素。自己完結した独立したコンテンツ（ブログ記事など）を示します。class="card"でカードデザインを適用します -->
             <article class="card">
+              <!-- header要素。記事のヘッダー部分です。class="post__header"でスタイルを適用します -->
               <header class="post__header">
+                <!-- h3要素。記事のタイトルです -->
                 <h3><a href="#">記事タイトル 1</a></h3>
+                <!-- time要素。日付や時刻を示します。datetime属性に機械可読な形式の日付を記述します -->
                 <time class="post__meta" datetime="2025-09-22"
                   >2025年9月22日</time
                 >
               </header>
+              <!-- p要素。段落を示します -->
               <p>
                 これは記事の抜粋です。このカードはコンテナクエリによって、親要素の幅に応じてレイアウトが変化します。
               </p>
+              <!-- footer要素。記事のフッター部分です。class="post__footer"でスタイルを適用します -->
               <footer class="post__footer">
+                <!-- a要素をボタンのように見せるためのスタイルを適用しています。class="btn btn--primary"で主要なボタンスタイルを適用します -->
                 <a href="#" class="btn btn--primary">続きを読む</a>
               </footer>
             </article>
+            <!-- 2つ目の記事カード -->
             <article class="card">
               <header class="post__header">
                 <h3><a href="#">記事タイトル 2</a></h3>
@@ -61,6 +93,7 @@
                 <a href="#" class="btn btn--primary">続きを読む</a>
               </footer>
             </article>
+            <!-- 3つ目の記事カード -->
             <article class="card">
               <header class="post__header">
                 <h3><a href="#">記事タイトル 3</a></h3>
@@ -79,15 +112,19 @@
         </section>
       </div>
 
+      <!-- aside要素。サイドバーなど、メインコンテンツとは関連が薄い補足的なコンテンツを配置します。class="aside"でスタイルを適用します -->
       <aside class="aside">
+        <!-- section要素。プロフィールセクション。class="card"でカードデザインを再利用しています -->
         <section class="card">
           <h2>プロフィール</h2>
           <p>
             ここに自己紹介文が入ります。サイドバーのコンテンツはPC幅の時だけ表示されます。
           </p>
         </section>
+        <!-- section要素。カテゴリーセクション -->
         <section class="card">
           <h2>カテゴリー</h2>
+          <!-- ul要素。class="list"でリスト用のスタイルを適用します -->
           <ul class="list">
             <li><a href="#">HTML</a></li>
             <li><a href="#">CSS</a></li>
@@ -97,16 +134,24 @@
       </aside>
     </main>
 
+    <!-- footer要素。サイトのフッター（下部）部分。class="site-footer"でスタイルを適用します -->
     <footer class="site-footer">
+      <!-- p要素。コピーライト情報を表示します -->
       <p>&copy; 2025 My Website. All Rights Reserved.</p>
     </footer>
 
+    <!-- script要素。JavaScriptを記述します。ページの最後に置くことで、HTMLの読み込みを妨げずに実行できます -->
     <script>
+      // id="theme-toggle"を持つボタン要素を取得します
       const themeToggle = document.getElementById('theme-toggle');
+      // HTMLのルート要素(<html>)を取得します
       const root = document.documentElement;
 
+      // ボタンがクリックされたときのイベントリスナーを追加します
       themeToggle.addEventListener('click', () => {
+        // 現在のテーマが'dark'かどうかを判定します
         const isDark = root.getAttribute('data-theme') === 'dark';
+        // 'dark'なら'light'に、そうでなければ'dark'にdata-theme属性を切り替えます
         root.setAttribute('data-theme', isDark ? 'light' : 'dark');
       });
     </script>
